@@ -37,6 +37,7 @@ sunspot_counts = np.array(sunspot_counts)
 last_year = 1985
 
 # Plot the data.
+"""
 plt.figure(1)
 plt.plot(years, republican_counts, 'o')
 plt.xlabel("Year")
@@ -49,8 +50,8 @@ plt.figure(3)
 plt.plot(sunspot_counts[years<last_year], republican_counts[years<last_year], 'o')
 plt.xlabel("Number of Sunspots")
 plt.ylabel("Number of Republicans in Congress")
-plt.show()
-
+#plt.show()
+"""
 # Create the simplest basis, with just the time and an offset.
 X = np.vstack((np.ones(years.shape), years)).T
 
@@ -59,35 +60,28 @@ X = np.vstack((np.ones(years.shape), years)).T
 # The shape of arrays you return should be: (a) 24x6, (b) 24x12, (c) 24x6, (c) 24x26
 # xx is the input of years (or any variable you want to turn into the appropriate basis).
 def make_basis(xx,part='a'):
+    result = []
     if part == 'a':
-        result = np.array([])
         for val in xx:
             arr = [val**e for e in range(1,6)]
             arr.insert(0, 1)
-            np.append(result, [arr], axis=0)
-        return result
+            result.append(arr)
     elif part == 'b':
-        result = np.array([])
         for val in xx:
             arr = [math.exp((-(val - e)**2)/25) for e in range(1960,2015,5)]
             arr.insert(0, 1)
-            np.append(result, [arr], axis=0)
-        return result
+            result.append(arr)
     elif part == 'c':
-        result = np.array([])
         for val in xx:
             arr = [math.cos(val/e) for e in range(1,6)]
             arr.insert(0, 1)
-            np.append(result, [arr], axis=0)
-        return result
+            result.append(arr)
     else:
-        result = np.array([])
         for val in xx:
             arr = [math.cos(val/e) for e in range(1,26)]
             arr.insert(0, 1)
-            np.append(result, [arr], axis=0)
-        return result
-
+            result.append(arr)
+    return np.array(result)
 
 
 # Nothing fancy for outputs.
@@ -99,7 +93,7 @@ def find_weights(X,Y):
     return w
 
 def find_residual_values(X, Y, w):
-    return np.sum(np.square(Y - np.dot(w,X)))
+    return np.sum(np.square(Y - np.dot(X,w)))
 
 X1_basis = make_basis(years, part='a')
 X2_basis = make_basis(years, part='b')
@@ -120,17 +114,45 @@ residuals.append(find_residual_values(X4_basis, republican_counts, w4))
 
 
 
+print(residuals)
+
+
+
 # Compute the regression line on a grid of inputs.
 # DO NOT CHANGE grid_years!!!!!
 grid_years = np.linspace(1960, 2005, 200)
 grid_X = np.vstack((np.ones(grid_years.shape), grid_years))
-grid_Yhat  = np.dot(grid_X.T, w)
+#grid_Yhat  = np.dot(grid_X.T, w)
+
+X1_basis = make_basis(years, part='a')
+X2_basis = make_basis(years, part='b')
+X3_basis = make_basis(years, part='c')
+X4_basis = make_basis(years, part='c')
+
+grid_Yhat1  = np.dot(make_basis(grid_years, part='a'), w1)
+grid_Yhat2  = np.dot(make_basis(grid_years, part='b'), w2)
+grid_Yhat3  = np.dot(make_basis(grid_years, part='c'), w3)
+grid_Yhat4  = np.dot(make_basis(grid_years, part='d'), w4)
+
 
 # TODO: plot and report sum of squared error for each basis
 
 # Plot the data and the regression line.
-plt.plot(years, republican_counts, 'o', grid_years, grid_Yhat, '-')
+plt.plot(years, republican_counts, 'o', grid_years, grid_Yhat1, '-')
 plt.xlabel("Year")
 plt.ylabel("Number of Republicans in Congress")
 plt.show()
+plt.plot(years, republican_counts, 'o', grid_years, grid_Yhat2, '-')
+plt.xlabel("Year")
+plt.ylabel("Number of Republicans in Congress")
+plt.show()
+plt.plot(years, republican_counts, 'o', grid_years, grid_Yhat3, '-')
+plt.xlabel("Year")
+plt.ylabel("Number of Republicans in Congress")
+plt.show()
+plt.plot(years, republican_counts, 'o', grid_years, grid_Yhat4, '-')
+plt.xlabel("Year")
+plt.ylabel("Number of Republicans in Congress")
+plt.show()
+
 

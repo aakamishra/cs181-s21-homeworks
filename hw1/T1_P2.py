@@ -25,15 +25,84 @@ y = y_df.values
 print("y is:")
 print(y)
 
+def kernel(x_n, x_i, W):
+    x_n = np.array([x_n]).reshape(2,1)
+    x_i = np.array([x_i]).reshape(2,1)
+
+    x_n_sub_x_i = x_n - x_i
+    x_n_sub_x_i_T = np.transpose(x_n_sub_x_i)
+    x_n_sub_x_i_T_dot_W = np.dot(x_n_sub_x_i_T, W)
+    product = np.dot(x_n_sub_x_i_T_dot_W, x_n_sub_x_i)
+    expo = np.exp(-product[0][0])
+
+    return expo
+
+def regressor(x_i, i, W):
+    numerator_sum = 0
+    N = len(X_df.values)
+    for n in range(N):
+        if n != i:
+            x_n = X_df.values[n]
+            y_n = y_df.values[n]
+            numerator_sum += kernel(x_n, x_i, W)*y_n
+
+    denominator_sum = 0
+
+    for n in range(N):
+        if n != i:
+            x_n = X_df.values[n]
+            y_n = y_df.values[n]
+            denominator_sum += kernel(x_n, x_i, W)
+
+    return numerator_sum/denominator_sum
+
 def predict_kernel(alpha=0.1):
-    """Returns predictions using kernel-based predictor with the specified alpha."""
-    # TODO: your code here
-    return y_df
+    W = alpha * np.array([[1., 0.], [0., 1.]])
+    i = 0
+    pred_y = []
+    for x_i in X_df.values:
+        pred_y.append(regressor(x_i, i, W))
+        i += 1
+    return pred_y
+
+def compare(dist1, dist2):
+    if dist1[0] < dist2[0]:
+        return -1
+    elif dist1[0] > dist2[0]:
+        return 1
+    else:
+        return 0
 
 def predict_knn(k=1):
-    """Returns predictions using KNN predictor with the specified k."""
-    # TODO: your code here
-    return y_df
+    pred_y = []
+    W = 1 * np.array([[1., 0.], [0., 1.]])
+
+    
+    for i in range(len(X_df.values)):
+        dist_list = []
+        for j in range(len(X_df.values)):
+            if i != j:
+                x_n = np.array([X_df.values[j]]).reshape(2,1)
+                x_i = np.array([X_df.values[i]]).reshape(2,1)
+
+                x_n_sub_x_i = x_n - x_i
+                x_n_sub_x_i_T = np.transpose(x_n_sub_x_i)
+                x_n_sub_x_i_T_dot_W = np.dot(x_n_sub_x_i_T, W)
+                product = np.dot(x_n_sub_x_i_T_dot_W, x_n_sub_x_i)
+                dist_list.append((product[0][0], j))
+
+        dist_list = sorted(dist_list, key=lambda x: x[0])
+
+        suma = 0
+        for i in range(k):
+            index = dist_list[i][1]
+            suma += y_df.values[index]
+        pred_y.append(suma/k)
+
+        i += 1
+
+    print("k: {}, pred: {}".format(k, pred_y))
+    return pred_y
 
 def plot_kernel_preds(alpha):
     title = 'Kernel Predictions with alpha = ' + str(alpha)
