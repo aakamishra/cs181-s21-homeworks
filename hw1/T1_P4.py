@@ -37,7 +37,7 @@ sunspot_counts = np.array(sunspot_counts)
 last_year = 1985
 
 # Plot the data.
-"""
+
 plt.figure(1)
 plt.plot(years, republican_counts, 'o')
 plt.xlabel("Year")
@@ -50,8 +50,9 @@ plt.figure(3)
 plt.plot(sunspot_counts[years<last_year], republican_counts[years<last_year], 'o')
 plt.xlabel("Number of Sunspots")
 plt.ylabel("Number of Republicans in Congress")
-#plt.show()
-"""
+plt.show()
+plt.close()
+
 # Create the simplest basis, with just the time and an offset.
 X = np.vstack((np.ones(years.shape), years)).T
 
