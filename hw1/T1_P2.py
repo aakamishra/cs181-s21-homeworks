@@ -119,7 +119,8 @@ def plot_kernel_preds(alpha):
     print(y_pred)
     print('L2: ' + str(sum((y - y_pred) ** 2)))
     norm = c.Normalize(vmin=0.,vmax=1.)
-    plt.scatter(df['x1'], df['x2'], c=y_pred, cmap='gray', vmin=0, vmax = 1, edgecolors='b')
+    plt.scatter(df['x1'], df['x2'], c=y_pred, cmap='gray', vmin=0, vmax = 1, edgecolors='b', label='L2: ' + str(sum((y - y_pred) ** 2)))
+    plt.legend()
     for x_1, x_2, y_ in zip(df['x1'].values, df['x2'].values, y_pred):
         plt.annotate(str(round(y_, 2)),
                      (x_1, x_2), 
@@ -146,7 +147,8 @@ def plot_knn_preds(k):
     print(y_pred)
     print('L2: ' + str(sum((y - y_pred) ** 2)))
     norm = c.Normalize(vmin=0.,vmax=1.)
-    plt.scatter(df['x1'], df['x2'], c=y_pred, cmap='gray', vmin=0, vmax = 1, edgecolors='b')
+    plt.scatter(df['x1'], df['x2'], c=y_pred, cmap='gray', vmin=0, vmax = 1, edgecolors='b', label='L2: ' + str(sum((y - y_pred) ** 2)))
+    plt.legend()
     for x_1, x_2, y_ in zip(df['x1'].values, df['x2'].values, y_pred):
         plt.annotate(str(round(y_, 2)),
                      (x_1, x_2), 

@@ -59,7 +59,17 @@ X = np.vstack((np.ones(years.shape), years)).T
 # Based on the letter input for part ('a','b','c','d'), output numpy arrays for the bases.
 # The shape of arrays you return should be: (a) 24x6, (b) 24x12, (c) 24x6, (c) 24x26
 # xx is the input of years (or any variable you want to turn into the appropriate basis).
-def make_basis(xx,part='a'):
+# is_years is a Boolean variable which indicates whether or not the input variable is
+# years; if so, is_years should be True, and if the input varible is sunspots, is_years
+# should be false
+def make_basis(xx,part='a',is_years=True):
+#DO NOT CHANGE LINES 65-69
+    if part == 'a' and is_years:
+        xx = (xx - np.array([1960]*len(xx)))/40
+        
+    if part == "a" and not is_years:
+        xx = xx/20
+
     result = []
     if part == 'a':
         for val in xx:
@@ -82,7 +92,9 @@ def make_basis(xx,part='a'):
             arr.insert(0, 1)
             result.append(arr)
     return np.array(result)
-
+        
+        
+    return None
 
 # Nothing fancy for outputs.
 Y = republican_counts
@@ -138,21 +150,86 @@ grid_Yhat4  = np.dot(make_basis(grid_years, part='d'), w4)
 # TODO: plot and report sum of squared error for each basis
 
 # Plot the data and the regression line.
+plt.title("A. Quintic Polynomial Basis")
+plt.scatter(years, republican_counts, label='L2: ' + str(residuals[0]))
 plt.plot(years, republican_counts, 'o', grid_years, grid_Yhat1, '-')
 plt.xlabel("Year")
 plt.ylabel("Number of Republicans in Congress")
-plt.show()
+plt.legend()
+plt.savefig('r' + str(1) + '.png')
+plt.close()
+plt.title("B. Expo Fraction Transformation")
+plt.scatter(years, republican_counts, label='L2: ' + str(residuals[1]))
 plt.plot(years, republican_counts, 'o', grid_years, grid_Yhat2, '-')
 plt.xlabel("Year")
 plt.ylabel("Number of Republicans in Congress")
-plt.show()
+plt.legend()
+plt.savefig('r' + str(2) + '.png')
+plt.close()
+plt.title("C. cos(x / j), j=[1,5]")
+plt.scatter(years, republican_counts, label='L2: ' + str(residuals[2]))
 plt.plot(years, republican_counts, 'o', grid_years, grid_Yhat3, '-')
 plt.xlabel("Year")
 plt.ylabel("Number of Republicans in Congress")
-plt.show()
+plt.legend()
+plt.savefig('r' + str(3) + '.png')
+plt.close()
+plt.title("D. cos(x / j), j=[1,25]")
+plt.scatter(years, republican_counts, label='L2: ' + str(residuals[3]))
 plt.plot(years, republican_counts, 'o', grid_years, grid_Yhat4, '-')
 plt.xlabel("Year")
 plt.ylabel("Number of Republicans in Congress")
-plt.show()
+plt.legend()
+plt.savefig('r' + str(4) + '.png')
+plt.close()
 
+sunspot_counts_1985 = sunspot_counts[years<last_year] 
+republican_counts_1985 = republican_counts[years<last_year]
 
+X1_basis = make_basis(sunspot_counts_1985, part='a', is_years=False)
+X3_basis = make_basis(sunspot_counts_1985, part='c', is_years=False)
+X4_basis = make_basis(sunspot_counts_1985, part='d', is_years=False)
+
+w1 = find_weights(X1_basis, republican_counts_1985)
+w3 = find_weights(X3_basis, republican_counts_1985)
+w4 = find_weights(X4_basis, republican_counts_1985)
+
+residuals = []
+
+residuals.append(find_residual_values(X1_basis, republican_counts_1985, w1))
+residuals.append(find_residual_values(X3_basis, republican_counts_1985, w3))
+residuals.append(find_residual_values(X4_basis, republican_counts_1985, w4))
+
+grid_sunspots = np.linspace(0, 155, 200)
+
+X1_basis = make_basis(grid_sunspots , part='a', is_years=False)
+X3_basis = make_basis(grid_sunspots , part='c', is_years=False)
+X4_basis = make_basis(grid_sunspots , part='d', is_years=False)
+
+grid_Yhat1  = np.dot(X1_basis, w1)
+grid_Yhat3  = np.dot(X3_basis, w3)
+grid_Yhat4  = np.dot(X4_basis, w4)
+
+plt.title("A. Quintic Polynomial Basis")
+plt.scatter(sunspot_counts_1985, republican_counts_1985, label='L2: ' + str(residuals[0]))
+plt.plot(sunspot_counts_1985, republican_counts_1985, 'o', grid_sunspots, grid_Yhat1, '-')
+plt.xlabel("Number of Sunspots")
+plt.ylabel("Number of Republicans in Congress")
+plt.legend()
+plt.savefig('r' + str(5) + '.png')
+plt.close()
+plt.title("C. cos(x / j), j=[1,5]")
+plt.scatter(sunspot_counts_1985, republican_counts_1985, label='L2: ' + str(residuals[1]))
+plt.plot(sunspot_counts_1985, republican_counts_1985, 'o', grid_sunspots, grid_Yhat3, '-')
+plt.xlabel("Number of Sunspots")
+plt.ylabel("Number of Republicans in Congress")
+plt.legend()
+plt.savefig('r' + str(7) + '.png')
+plt.close()
+plt.title("D. cos(x / j), j=[1,25]")
+plt.scatter(sunspot_counts_1985, republican_counts_1985, label='L2: ' + str(residuals[2]))
+plt.plot(sunspot_counts_1985, republican_counts_1985, 'o', grid_sunspots, grid_Yhat4, '-')
+plt.xlabel("Number of Sunspots")
+plt.ylabel("Number of Republicans in Congress")
+plt.legend()
+plt.savefig('r' + str(8) + '.png')
